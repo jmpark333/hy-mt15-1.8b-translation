@@ -28,6 +28,7 @@ ENV/
 
 # IDE
 .vscode/
+.claude
 .idea/
 *.swp
 *.swo
@@ -42,3 +43,6 @@ Thumbs.db
 # Environment variables
 .env
 .venv
+
+# Big files
+*.gguf

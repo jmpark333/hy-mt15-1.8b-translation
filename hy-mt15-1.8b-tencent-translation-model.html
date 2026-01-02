@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HY-MT1.5-1.8B: 텐센트 혼위안의 경량 번역 모델 완벽 가이드</title>
+    <meta name="description" content="텐센트 혼위안 HY-MT1.5-1.8B 모델 소개, 설치 방법, 실전 사용 예제까지 완벽 정리. 33개 언어 지원 경량 번역 모델을 로컬에서 활용하는 방법을 배워보세요.">
+    <meta property="og:title" content="HY-MT1.5-1.8B: 텐센트 혼위안의 경량 번역 모델 완벽 가이드">
+    <meta property="og:description" content="1.8B 파라미터로 33개 언어 번역 가능! 텐센트의 HY-MT1.5-1.8B를 설치하고 사용하는 방법을 상세히 설명합니다.">
+    <meta property="og:type" content="article">
+</head>
+<body>
+<div>
+<style>
+/* AI 기술 블로그 표준 스타일 */
+body {
+  font-family: "Noto Sans KR", "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 1.8;
+  color: #333;
+}
+p {
+    margin-bottom: 1.2em;
+    word-break: keep-all;
+}
+h2 {
+  border-bottom: 2px solid #0066cc;
+  padding-bottom: 10px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #0066cc;
+}
+h3 {
+    font-size: 1.2em;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e6f2ff;
+    padding-bottom: 5px;
+    color: #0066cc;
+}
+.concept-block {
+    background-color: #f0f8ff;
+    border-left: 4px solid #0066cc;
+    padding: 15px 20px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+}
+.code-block {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    font-family: 'Courier New', monospace;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+.performance-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 16px;
+  text-align: center;
+}
+.performance-table th, .performance-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+}
+.performance-table th {
+  background-color: #0066cc;
+  color: white;
+  font-weight: bold;
+}
+.performance-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+.ai-tech {
+  background-color: #e6f3ff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: #0066cc;
+}
+.warning {
+    background-color: #fff3cd;
+    border-left: 5px solid #ffc107;
+    padding: 15px;
+    margin: 20px 0;
+}
+.info {
+    background-color: #d1ecf1;
+    border-left: 5px solid #17a2b8;
+    padding: 15px;
+    margin: 20px 0;
+}
+.code-block.collapsed {
+    max-height: 200px;
+}
+.code-block.expanded {
+    max-height: none;
+}
+.code-toggle-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 102, 204, 0.8);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    z-index: 10;
+    transition: background-color 0.3s ease;
+}
+.code-toggle-btn:hover {
+    background-color: rgba(0, 102, 204, 1);
+}
+.code-block.collapsed .code-toggle-btn::after {
+    content: "펼치기 ▼";
+}
+.code-block.expanded .code-toggle-btn::after {
+    content: "접기 ▲";
+}
+.code-fade-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(transparent, #f5f5f5);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+.code-block.expanded .code-fade-overlay {
+    opacity: 0;
+}
+</style>
+</div>
+
+<p data-ke-size="size16">최근 AI 번역 기술이 급격히 발전하면서, <span class="ai-tech">대규모 언어 모델(LLM)</span> 기반의 번역 시스템이 주목받고 있습니다. 텐센트(Tencent)에서 개발한 <b>혼위안(Hunyuan) 번역 모델 HY-MT1.5-1.8B</b>는 경량화된 크기에도 불구하고 33개 언어를 상호 번역할 수 있는 강력한 성능을 자랑합니다. 이 글에서는 HY-MT1.5-1.8B 모델의 특징과 실제 사용 방법을 상세히 알아보겠습니다.</p>
+
+<h2 id="introduction" data-ke-size="size23">🤖 HY-MT1.5-1.8B 소개</h2>
+
+<p data-ke-size="size16">HY-MT1.5-1.8B는 텐센트 혼위안 팀에서 개발한 <b>번역 전용 AI 모델</b>입니다. 이름에서 알 수 있듯이 이 모델은 약 <b>18억 개(1.8B)</b>의 파라미터(매개변수)를 가지고 있습니다. 파라미터는 AI 모델이 학습하는 가중치 값들로, 개수가 많을수록 모델의 복잡도와 성능이 높아지지만 그만큼 더 많은 컴퓨팅 자원이 필요합니다.</p>
+
+<div class="concept-block">
+<p data-ke-size="size16"><b>📌 파라미터(Parameter)란?</b><br>
+AI 모델에서 파라미터는 모델이 데이터에서 학습한 모든 지식을 저장하는 변수입니다. 쉽게 비유하자면, 파라미터는 인간의 뇌세포처럼 정보를 처리하고 저장하는 단위입니다. 1.8B 파라미터는 약 18억 개의 지식 저장소가 있다는 의미입니다.</p>
+</div>
+
+<p data-ke-size="size16"><b>핵심 특징:</b></p>
+<ul>
+<li>경량화된 크기로도 <span class="ai-tech">7B 모델</b>과 유사한 번역 성능 달성</li>
+<li>33개 언어 상호 번역 지원 (한국어, 영어, 일본어, 중국어 등)</li>
+<li>5개 소수 언어 및 방언 지원 (광동어, 위구르어, 티베트어 등)</li>
+<li>엣지 디바이스(Edge Device) 배포 가능</li>
+<li>실시간 번역 시나리오에 최적화</li>
+<li>용어 개입(Terminology Intervention), 문맥 번역, 형식 보존 번역 지원</li>
+</ul>
+
+<h2 id="why-hy-mt15" data-ke-size="size23">💡 HY-MT1.5-1.8B가 특별한 이유</h2>
+
+<p data-ke-size="size16">HY-MT1.5-1.8B는 단순한 번역 모델이 아닙니다. 이 모델의 가장 큰 장점은 <b>"작지만 강력하다"</b>는 점입니다.</p>
+
+<h3 id="performance-efficiency" data-ke-size="size20">⚡ 성능과 효율의 균형</h3>
+
+<p data-ke-size="size16">HY-MT1.5-7B 모델의 파라미터 크기가 3분의 1 미만이지만, 번역 성능은 거의 비슷한 수준을 보입니다. 이는 매우 중요한 장점입니다.</p>
+
+<div class="concept-block">
+<p data-ke-size="size16"><b>🎯 왜 경량 모델이 중요할까요?</b></p>
+<p data-ke-size="size16">경량 모델은 다음과 같은 이점이 있습니다:</p>
+<ul>
+<li><b>더 적은 메모리 사용:</b> 일반 PC나 노트북에서도 구동 가능</li>
+<li><b>빠른 추론 속도:</b> 실시간 번역 서비스 제공에 적합</li>
+<li><b>낮은 운영 비용:</b> 클라우드 서버 비용 절감</li>
+<li><b>엣지 디바이스 배포:</b> 스마트폰, 태블릿 등에서도 실행 가능</li>
+</ul>
+</div>
+
+<h3 id="advanced-features" data-ke-size="size20">🔧 고급 번역 기능</h3>
+
+<p data-ke-size="size16">HY-MT1.5 시리즈는 단순한 텍스트 번역을 넘어 다음과 같은 고급 기능을 지원합니다:</p>
+
+<p data-ke-size="size16"><b>1. 용어 개입 (Terminology Intervention)</b><br>
+특정 전문 용어나 고유명사가 원하는 대로 번역되도록 제어할 수 있습니다. 예를 들어 "Apple"을 "사과" 대신 "애플(기업)"로 번역하도록 지정할 수 있습니다.</p>
+
+<p data-ke-size="size16"><b>2. 문맥 번역 (Contextual Translation)</b><br>
+이전 문맥을 고려하여 더 정확한 번역을 제공합니다. 예를 들어 "bank"가 "은행"인지 "강가"인지 문맥에 따라 구분합니다.</p>
+
+<p data-ke-size="size16"><b>3. 형식 보존 번역 (Formatted Translation)</b><br>
+HTML 태그, 마크다운 형식 등을 보존하면서 번역합니다. 웹사이트 다국어화 작업에 매우 유용합니다.</p>
+
+<h2 id="supported-languages" data-ke-size="size23">🌍 지원 언어</h2>
+
+<p data-ke-size="size16">HY-MT1.5-1.8B는 총 33개 언어와 5개 소수 언어/방언을 지원합니다. 주요 지원 언어는 다음과 같습니다:</p>
+
+<table class="performance-table">
+<thead>
+<tr>
+<th>언어</th>
+<th>약어</th>
+<th>언어</th>
+<th>약어</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>한국어</td>
+<td>ko</td>
+<td>영어</td>
+<td>en</td>
+</tr>
+<tr>
+<td>일본어</td>
+<td>ja</td>
+<td>중국어(간체)</td>
+<td>zh</td>
+</tr>
+<tr>
+<td>중국어(번체)</td>
+<td>zh-Hant</td>
+<td>프랑스어</td>
+<td>fr</td>
+</tr>
+<tr>
+<td>스페인어</td>
+<td>es</td>
+<td>포르투갈어</td>
+<td>pt</td>
+</tr>
+<tr>
+<td>독일어</td>
+<td>de</td>
+<td>이탈리아어</td>
+<td>it</td>
+</tr>
+<tr>
+<td>러시아어</td>
+<td>ru</td>
+<td>아랍어</td>
+<td>ar</td>
+</tr>
+<tr>
+<td>힌디어</td>
+<td>hi</td>
+<td>태국어</td>
+<td>th</td>
+</tr>
+<tr>
+<td>베트남어</td>
+<td>vi</td>
+<td>인도네시아어</td>
+<td>id</td>
+</tr>
+<tr>
+<td>말레이어</td>
+<td>ms</td>
+<td>터키어</td>
+<td>tr</td>
+</tr>
+</tbody>
+</table>
+
+<p data-ke-size="size16"><b>소수 언어/방언:</b> 광동어, 티베트어, 카자흐어, 몽골어, 위구르어 등</p>
+
+<h2 id="installation" data-ke-size="size23">🚀 설치 방법</h2>
+
+<p data-ke-size="size16">이제 HY-MT1.5-1.8B를 직접 설치하고 사용하는 방법을 알아보겠습니다. Python 프로그래밍 기초 지식이 있다면 따라 하실 수 있습니다.</p>
+
+<h3 id="requirements" data-ke-size="size20">📋 사전 요구사항</h3>
+
+<div class="info">
+<p data-ke-size="size16"><b>⚙️ 시스템 요구사항</b></p>
+<ul>
+<li><b>CPU:</b> 최신 멀티코어 프로세서</li>
+<li><b>RAM:</b> 최소 8GB (권장 16GB 이상)</li>
+<li><b>GPU:</b> NVIDIA GPU (권장) 또는 CPU-only 가능</li>
+<li><b>운영체제:</b> Linux, macOS, Windows</li>
+<li><b>Python:</b> 3.8 이상</li>
+</ul>
+</div>
+
+<h3 id="transformers-install" data-ke-size="size20">🔧 Transformers 라이브러리로 설치하기</h3>
+
+<p data-ke-size="size16">가장 쉬운 방법은 Hugging Face Transformers 라이브러리를 사용하는 것입니다. 터미널(또는 명령 프롬프트)에서 다음 명령어를 실행하세요:</p>
+
+<div class="code-block">
+<pre class="bash"><code># Transformers 라이브러리 설치 (버전 4.56.0 권장)
+pip install transformers==4.56.0
+
+# 추가 필요 패키지
+pip install torch accelerate sentencepiece</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<div class="warning">
+<p data-ke-size="size16"><b>⚠️ 주의사항</b><br>
+GPU가 없는 경우 CPU-only로도 실행 가능하지만 속도가 느려집니다. NVIDIA GPU가 있는 경우 CUDA 버전에 맞는 PyTorch를 설치하세요.</p>
+</div>
+
+<h3 id="basic-usage" data-ke-size="size20">💻 기본 사용 예제</h3>
+
+<p data-ke-size="size16">이제 Python 코드로 모델을 로드하고 번역을 수행해 보겠습니다:</p>
+
+<div class="code-block">
+<pre class="python"><code>from transformers import AutoModelForCausalLM, AutoTokenizer
+
+# 모델 이름 지정
+model_name = "tencent/HY-MT1.5-1.8B"
+
+# 토크나이저와 모델 로드
+print("모델을 로드하는 중...")
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    device_map="auto",  # GPU가 있으면 자동으로 사용
+    torch_dtype="auto"  # 적절한 데이터 타입 자동 선택
+)
+
+# 번역할 텍스트와 대상 언어 설정
+source_text = "Hello, how are you today?"
+target_language = "Korean"
+
+# 프롬프트 생성
+messages = [
+    {
+        "role": "user",
+        "content": f"Translate the following segment into {target_language}, without additional explanation.\n\n{source_text}"
+    }
+]
+
+# 토큰화
+tokenized_chat = tokenizer.apply_chat_template(
+    messages,
+    tokenize=True,
+    add_generation_prompt=False,
+    return_tensors="pt"
+)
+
+# 번역 생성
+print("번역 중...")
+outputs = model.generate(
+    tokenized_chat.to(model.device),
+    max_new_tokens=2048,
+    temperature=0.7,
+    top_p=0.6,
+    top_k=20,
+    repetition_penalty=1.05
+)
+
+# 결과 디코딩
+output_text = tokenizer.decode(outputs[0])
+print("\n번역 결과:")
+print(output_text)</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<h3 id="korean-translation" data-ke-size="size20">🇰🇷 한국어 번역 예제</h3>
+
+<p data-ke-size="size16">한국어와 영어 간 번역은 다음과 같은 프롬프트를 사용합니다:</p>
+
+<div class="code-block">
+<pre class="python"><code># 영어 → 한국어
+def translate_to_korean(text):
+    messages = [
+        {
+            "role": "user",
+            "content": f"Translate the following segment into Korean, without additional explanation.\n\n{text}"
+        }
+    ]
+
+    tokenized_chat = tokenizer.apply_chat_template(
+        messages,
+        tokenize=True,
+        add_generation_prompt=False,
+        return_tensors="pt"
+    )
+
+    outputs = model.generate(
+        tokenized_chat.to(model.device),
+        max_new_tokens=2048,
+        temperature=0.7,
+        top_p=0.6,
+        top_k=20,
+        repetition_penalty=1.05
+    )
+
+    return tokenizer.decode(outputs[0])
+
+# 사용 예시
+english_text = "Artificial intelligence is transforming the world."
+korean_result = translate_to_korean(english_text)
+print("번역 결과:", korean_result)</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<div class="code-block">
+<pre class="python"><code># 한국어 → 영어
+def translate_to_english(text):
+    messages = [
+        {
+            "role": "user",
+            "content": f"将以下文本翻译为英语，注意只需要输出翻译后的结果，不要额外解释：\n\n{text}"
+        }
+    ]
+
+    tokenized_chat = tokenizer.apply_chat_template(
+        messages,
+        tokenize=True,
+        add_generation_prompt=False,
+        return_tensors="pt"
+    )
+
+    outputs = model.generate(
+        tokenized_chat.to(model.device),
+        max_new_tokens=2048,
+        temperature=0.7,
+        top_p=0.6,
+        top_k=20,
+        repetition_penalty=1.05
+    )
+
+    return tokenizer.decode(outputs[0])
+
+# 사용 예시
+korean_text = "인공지능 기술이 우리 삶을 변화시키고 있습니다."
+english_result = translate_to_english(korean_text)
+print("Translation:", english_result)</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<h3 id="terminology-intervention" data-ke-size="size20">🎯 용어 개입 번역 예제</h3>
+
+<p data-ke-size="size16">특정 용어를 원하는 대로 번역하도록 제어하는 방법입니다:</p>
+
+<div class="code-block">
+<pre class="python"><code>def translate_with_terminology(source_text, source_term, target_term, target_language):
+    """
+    용어 개입 번역 함수
+
+    Args:
+        source_text: 번역할 원본 텍스트
+        source_term: 원본 용어
+        target_term: 번역될 용어
+        target_language: 대상 언어
+    """
+    if target_language == "Chinese":
+        prompt = f"""参考下面的翻译：
+{source_term} 翻译成 {target_term}
+
+将以下文本翻译为{target_language}，注意只需要输出翻译后的结果，不要额外解释：
+{source_text}"""
+    else:
+        prompt = f"""Reference translation:
+{source_term} should be translated as {target_term}
+
+Translate the following segment into {target_language}, without additional explanation.
+{source_text}"""
+
+    messages = [{"role": "user", "content": prompt}]
+
+    tokenized_chat = tokenizer.apply_chat_template(
+        messages,
+        tokenize=True,
+        add_generation_prompt=False,
+        return_tensors="pt"
+    )
+
+    outputs = model.generate(
+        tokenized_chat.to(model.device),
+        max_new_tokens=2048,
+        temperature=0.7,
+        top_p=0.6,
+        top_k=20,
+        repetition_penalty=1.05
+    )
+
+    return tokenizer.decode(outputs[0])
+
+# 사용 예시: "Cloud"를 "클라우드"로 일관되게 번역
+text = "The company provides Cloud services for enterprise customers."
+result = translate_with_terminology(
+    source_text=text,
+    source_term="Cloud",
+    target_term="클라우드",
+    target_language="Korean"
+)
+print("번역 결과:", result)</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<h2 id="ollama-installation" data-ke-size="size23">🦙 Ollama로 로컬 설치하기</h2>
+
+<p data-ke-size="size16">Python 코드를 작성하지 않고 더 쉽게 사용하고 싶다면, <b>Ollama</b>를 활용할 수 있습니다. HY-MT1.5-1.8B는 GGUF 포맷으로 제공되어 Ollama에서 바로 사용 가능합니다.</p>
+
+<h3 id="ollama-setup" data-ke-size="size20">📥 Ollama 설치 및 설정</h3>
+
+<div class="code-block">
+<pre class="bash"><code># 1. Ollama 설치 (Linux/macOS)
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Windows의 경우: https://ollama.com/download에서 설치 파일 다운로드
+
+# 2. 모델 다운로드 및 실행
+ollama run tencent-hy-mt15-1.8b
+
+# 3. 번역 테스트
+echo "Translate this to Korean: Hello, world" | ollama run tencent-hy-mt15-1.8b</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<p data-ke-size="size16">Ollama를 사용하면 명령줄에서 바로 번역을 수행할 수 있어 간편합니다. 또한 Ollama는 OpenAI 호환 API도 제공하므로 기존 애플리케이션에 쉽게 통합할 수 있습니다.</p>
+
+<h3 id="ollama-python-api" data-ke-size="size20">🐍 Ollama Python API 사용</h3>
+
+<div class="code-block">
+<pre class="python"><code>import ollama
+
+# Ollama 클라이언트 생성
+client = ollama.Client()
+
+# 번역 함수
+def translate_with_ollama(text, target_lang="Korean"):
+    prompt = f"Translate the following segment into {target_lang}, without additional explanation.\n\n{text}"
+
+    response = client.chat(
+        model='tencent-hy-mt15-1.8b',
+        messages=[{'role': 'user', 'content': prompt}],
+        options={
+            'temperature': 0.7,
+            'top_p': 0.6,
+            'top_k': 20,
+            'num_predict': 2048
+        }
+    )
+
+    return response['message']['content']
+
+# 사용 예시
+result = translate_with_ollama(
+    "Machine learning is a subset of artificial intelligence.",
+    "Korean"
+)
+print("번역 결과:", result)</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<h2 id="practical-examples" data-ke-size="size23">💼 실전 활용 예제</h2>
+
+<p data-ke-size="size16">이제 실제 업무나 프로젝트에서 HY-MT1.5-1.8B를 활용할 수 있는 방법을 알아보겠습니다.</p>
+
+<h3 id="batch-translation" data-ke-size="size20">📄 대량 텍스트 파일 번역</h3>
+
+<div class="code-block">
+<pre class="python"><code>def translate_file(input_file, output_file, target_language):
+    """
+    텍스트 파일을 읽어서 번역 후 저장
+
+    Args:
+        input_file: 입력 파일 경로
+        output_file: 출력 파일 경로
+        target_language: 대상 언어
+    """
+    # 파일 읽기
+    with open(input_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    print(f"파일 번역 시작: {input_file}")
+    print(f"대상 언어: {target_language}")
+
+    # 번역 수행
+    messages = [
+        {
+            "role": "user",
+            "content": f"Translate the following segment into {target_language}, without additional explanation.\n\n{content}"
+        }
+    ]
+
+    tokenized_chat = tokenizer.apply_chat_template(
+        messages,
+        tokenize=True,
+        add_generation_prompt=False,
+        return_tensors="pt"
+    )
+
+    outputs = model.generate(
+        tokenized_chat.to(model.device),
+        max_new_tokens=4096,
+        temperature=0.7,
+        top_p=0.6,
+        top_k=20,
+        repetition_penalty=1.05
+    )
+
+    translated_text = tokenizer.decode(outputs[0])
+
+    # 파일 저장
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write(translated_text)
+
+    print(f"번역 완료! 저장됨: {output_file}")
+
+# 사용 예시
+translate_file(
+    input_file="document_en.txt",
+    output_file="document_ko.txt",
+    target_language="Korean"
+)</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<h3 id="web-api" data-ke-size="size20">🌐 간단한 번역 API 서버 만들기</h3>
+
+<p data-ke-size="size16">Flask를 사용하여 간단한 번역 API 서버를 만들어 보겠습니다:</p>
+
+<div class="code-block">
+<pre class="python"><code>from flask import Flask, request, jsonify
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+app = Flask(__name__)
+
+# 모델 로드 (전역 변수로 한 번만 로드)
+model_name = "tencent/HY-MT1.5-1.8B"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    device_map="auto",
+    torch_dtype="auto"
+)
+
+@app.route('/translate', methods=['POST'])
+def translate():
+    """
+    번역 API 엔드포인트
+
+    JSON 형식:
+    {
+        "text": "번역할 텍스트",
+        "target_language": "Korean"
+    }
+    """
+    try:
+        data = request.get_json()
+        text = data.get('text', '')
+        target_language = data.get('target_language', 'Korean')
+
+        if not text:
+            return jsonify({'error': '텍스트가 비어있습니다.'}), 400
+
+        # 번역 수행
+        messages = [
+            {
+                "role": "user",
+                "content": f"Translate the following segment into {target_language}, without additional explanation.\n\n{text}"
+            }
+        ]
+
+        tokenized_chat = tokenizer.apply_chat_template(
+            messages,
+            tokenize=True,
+            add_generation_prompt=False,
+            return_tensors="pt"
+        )
+
+        outputs = model.generate(
+            tokenized_chat.to(model.device),
+            max_new_tokens=2048,
+            temperature=0.7,
+            top_p=0.6,
+            top_k=20,
+            repetition_penalty=1.05
+        )
+
+        translated_text = tokenizer.decode(outputs[0])
+
+        return jsonify({
+            'success': True,
+            'original_text': text,
+            'translated_text': translated_text,
+            'target_language': target_language
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    print("번역 API 서버 시작中...")
+    app.run(host='0.0.0.0', port=5000, debug=True)</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<p data-ke-size="size16"><b>API 사용 예시 (curl):</b></p>
+
+<div class="code-block">
+<pre class="bash"><code>curl -X POST http://localhost:5000/translate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Hello, how are you?",
+    "target_language": "Korean"
+  }'</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<h2 id="quantization" data-ke-size="size23">⚡ 양자화(Quantization)로 속도 높이기</h2>
+
+<p data-ke-size="size16">HY-MT1.5-1.8B는 양자화된 버전도 제공합니다. 양자화는 모델의 정밀도를 낮추어 메모리 사용량과 추론 속도를 개선하는 기술입니다.</p>
+
+<div class="concept-block">
+<p data-ke-size="size16"><b>📌 양자화(Quantization)란?</b><br>
+양자화는 모델의 가중치 값을 16비트나 32비트에서 8비트나 4비트로 줄이는 과정입니다. 쉽게 말해, 고화질 이미지를 압축하여 용량을 줄이는 것과 비슷합니다. 성능 저하를 최소화하면서 모델 크기를 획기적으로 줄일 수 있습니다.</p>
+</div>
+
+<h3 id="int4-quantization" data-ke-size="size20">🎯 INT4 양자화 모델 사용</h3>
+
+<p data-ke-size="size16">INT4 양자화 버전을 사용하면 메모리 사용량을 더 줄일 수 있습니다:</p>
+
+<div class="code-block">
+<pre class="python"><code>from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+
+# INT4 양자화 모델 로드
+model_name = "tencent/HY-MT1.5-1.8B-GPTQ-Int4"
+
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    device_map="auto",
+    torch_dtype=torch.float16
+)
+
+# 이후 사용 방법은 동일
+messages = [
+    {
+        "role": "user",
+        "content": "Translate the following segment into Korean, without additional explanation.\n\nHello, world!"
+    }
+]
+
+tokenized_chat = tokenizer.apply_chat_template(
+    messages,
+    tokenize=True,
+    add_generation_prompt=False,
+    return_tensors="pt"
+)
+
+outputs = model.generate(
+    tokenized_chat.to(model.device),
+    max_new_tokens=2048
+)
+
+print(tokenizer.decode(outputs[0]))</code></pre>
+<button class="code-toggle-btn"></button>
+<div class="code-fade-overlay">&nbsp;</div>
+</div>
+
+<div class="info">
+<p data-ke-size="size16"><b>💡 양자화 모델 선택 가이드</b></p>
+<ul>
+<li><b>FP8:</b> 성능 저하 최소, GPU 권장</li>
+<li><b>INT4:</b> 최대 메모리 절약, CPU에서도 실행 가능</li>
+<li><b>GGUF:</b> Ollama 등 로컬 환경에서 사용</li>
+</ul>
+</div>
+
+<h2 id="comparison" data-ke-size="size23">📊 다른 번역 모델과 비교</h2>
+
+<p data-ke-size="size16">HY-MT1.5-1.8B를 다른 인기 번역 모델들과 비교해 보겠습니다:</p>
+
+<table class="performance-table">
+<thead>
+<tr>
+<th>모델</th>
+<th>파라미터</th>
+<th>지원 언어</th>
+<th>장점</th>
+<th>단점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HY-MT1.5-1.8B</td>
+<td>1.8B</td>
+<td>33+5</td>
+<td>경량, 고성능, 다국어</td>
+<td>상대적으로 신규 모델</td>
+</tr>
+<tr>
+<td>NLLB-200</td>
+<td>3.3B/1.3B</td>
+<td>200</td>
+<td>다양한 언어 지원</td>
+<td>용어 개입 기능 부족</td>
+</tr>
+<tr>
+<td>SeamlessM4T</td>
+<td>2.3B</td>
+<td>100</td>
+<td>음성 번역 지원</td>
+<td>텍스트 전문 아님</td>
+</tr>
+<tr>
+<td>Google Translate API</td>
+<td>-</td>
+<td>130+</td>
+<td>안정적, 신뢰성</td>
+<td>유료, API 의존</td>
+</tr>
+<tr>
+<td>DeepL API</td>
+<td>-</td>
+<td>30</td>
+<td>번역 품질 우수</td>
+<td>유료, 언어 제한</td>
+</tr>
+</tbody>
+</table>
+
+<p data-ke-size="size16"><b>HY-MT1.5-1.8B의 경쟁력:</b></p>
+<ul>
+<li>오픈소스로 무료 사용 가능</li>
+<li>로컬 배포로 데이터 프라이버시 보호</li>
+<li>커스터마이징 가능 (파인튜닝)</li>
+<li>엣지 디바이스에서 실시간 번역 가능</li>
+<li>용어 개입, 문맥 번역 등 고급 기능 지원</li>
+</ul>
+
+<h2 id="limitations" data-ke-size="size23">⚠️ 사용 시 주의사항</h2>
+
+<p data-ke-size="size16">HY-MT1.5-1.8B는 강력한 번역 모델이지만, 다음과 같은 제한사항을 고려해야 합니다:</p>
+
+<ul>
+<li><b>매우 긴 텍스트:</b> 한 번에 번역할 수 있는 텍스트 길이에 제한이 있음</li>
+<li><b>전문 분야:</b> 의학, 법률 등 전문 용어가 많은 분야는 추가 파인튜닝 필요</li>
+<li><b>실시간 성능:</b> CPU-only 환경에서는 속도가 느려질 수 있음</li>
+<li><b>언어 간 성능 차이:</b> 주요 언어(영어, 중국어)와 소수 언어 간 성능 차이 존재</li>
+</ul>
+
+<div class="warning">
+<p data-ke-size="size16"><b>⚠️ 상업적 사용 주의사항</b><br>
+HY-MT1.5-1.8B는 오픈소스 모델이지만, 상업적 사용 시 텐센트의 라이선스 정책을 확인해야 합니다. 또한 번역 결과를 상용 서비스에 제공할 경우 법적 책임을 고려해야 합니다.</p>
+</div>
+
+<h2 id="conclusion" data-ke-size="size23">🎯 맺음말</h2>
+
+<p data-ke-size="size16">HY-MT1.5-1.8B는 텐센트 혼위안 팀이 개발한 경량 번역 모델로, 33개 언어를 지원하면서도 경량화된 크기로 뛰어난 성능을 발휘합니다. 특히 <b>엣지 디바이스 배포</b>, <b>실시간 번역</b>, <b>용어 개입</b>, <b>문맥 번역</b> 등의 고급 기능을 제공하여 다양한 실전 시나리오에 활용할 수 있습니다.</p>
+
+<p data-ke-size="size16">이 글에서 소개한 설치 방법과 코드 예제를 따라 하시면, 여러분도 개인 PC나 노트북에서 강력한 AI 번역 시스템을 구축할 수 있습니다. 특히 Ollama를 활용하면 Python 코드를 작성하지 않고도 명령줄에서 바로 번역을 사용할 수 있습니다.</p>
+
+<p data-ke-size="size16">HY-MT1.5-1.8B 모델은 <span class="ai-tech">오픈소스</span>로 무료 제공되므로, 번역 API 비용을 절감하고 싶은 기업이나 개발자들에게 훌륭한 선택지가 될 것입니다. 여러분도 한번 텐센트 혼위안의 HY-MT1.5-1.8B를 설치해서 직접 사용해보시길 추천드립니다.</p>
+
+<p data-ke-size="size16">감사합니다.</p>
+
+<h2 id="references" data-ke-size="size23">📚 참고자료</h2>
+
+<ul>
+<li><a href="https://huggingface.co/tencent/HY-MT1.5-1.8B" target="_blank" rel="noopener">Hugging Face - HY-MT1.5-1.8B</a></li>
+<li><a href="https://github.com/Tencent-Hunyuan/HY-MT" target="_blank" rel="noopener">GitHub - Tencent Hunyuan MT</a></li>
+<li><a href="https://hunyuan.tencent.com/" target="_blank" rel="noopener">혼위안 공식 웹사이트</a></li>
+<li><a href="https://ollama.com/" target="_blank" rel="noopener">Ollama 공식 웹사이트</a></li>
+<li><a href="https://arxiv.org/abs/2512.24092" target="_blank" rel="noopener">HY-MT1.5 Technical Report</a></li>
+</ul>
+
+<p data-ke-size="size16"><b>키워드:</b> AI, 머신러닝, 딥러닝, LLM, 번역 모델, 혼위안</p>
+
+<p data-ke-size="size16">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const codeBlocks = document.querySelectorAll('.code-block');
+
+    codeBlocks.forEach(function(block) {
+        const preElement = block.querySelector('pre');
+
+        if (preElement) {
+            const blockHeight = preElement.offsetHeight;
+
+            if (blockHeight > 300) {
+                block.classList.add('collapsed');
+
+                const fadeOverlay = document.createElement('div');
+                fadeOverlay.className = 'code-fade-overlay';
+                block.appendChild(fadeOverlay);
+
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'code-toggle-btn';
+                block.appendChild(toggleBtn);
+
+                toggleBtn.addEventListener('click', function() {
+                    toggleCodeBlock(block);
+                });
+            }
+        }
+    });
+
+    function toggleCodeBlock(block) {
+        const isCollapsed = block.classList.contains('collapsed');
+
+        if (isCollapsed) {
+            block.classList.remove('collapsed');
+            block.classList.add('expanded');
+        } else {
+            block.classList.remove('expanded');
+            block.classList.add('collapsed');
+        }
+    }
+});
+</script>
+</p>
+
+</body>
+</html>
