@@ -69,21 +69,16 @@ Modelfile 설정:
 
 ```
 FROM ./HY-MT1.5-1.8B-Q4_K_M.gguf
-PARAMETER temperature 0.7
-PARAMETER top_p 0.6
-PARAMETER top_k 20
-PARAMETER num_predict 2048
+
 TEMPLATE """
-{{- range .Messages }}
-{{- if .Role == "user" }}User: {{ .Content }}
-{{- else if .Role == "assistant" }}Assistant: {{ .Content }}
-{{- end }}
-{{- end }}
-Assistant:
+{{ .Prompt }}
 """
-PARAMETER stop "User:"
-PARAMETER stop "Assistant:"
-SYSTEM ""You are a professional translator. Translate the given text accurately and naturally.""
+
+SYSTEM """
+You are a professional translation model.
+Translate accurately and naturally.
+"""
+
 ```
 
 ## 프로젝트 구조
